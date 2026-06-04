@@ -11,6 +11,7 @@ export function Setup() {
   const { user } = useAuth();
   const { setProfile } = useAppStore();
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
   
   const [formData, setFormData] = useState({
     age: 30,
@@ -26,6 +27,7 @@ export function Setup() {
     if (!user) return;
     
     setLoading(true);
+    setErrorMsg('');
 
     const profile: UserProfile = {
       ...formData,
@@ -43,8 +45,9 @@ export function Setup() {
       }, { merge: true });
       
       setProfile(profile);
-    } catch (error) {
+    } catch (error: any) {
       handleFirestoreError(error, OperationType.WRITE, `users/${user.uid}`);
+      setErrorMsg(error?.message || 'Failed to save profile. Make sure Firestore is enabled in your Firebase console and your security rules allow writes.');
     } finally {
       setLoading(false);
     }
@@ -64,6 +67,11 @@ export function Setup() {
           <p className="text-slate-500 mt-2">
             Set up your body profile so we can track and calculate your needs accurately.
           </p>
+          {errorMsg && (
+            <div className="mt-4 p-4 bg-red-50 text-red-700 rounded-xl text-sm font-medium border border-red-100">
+              {errorMsg}
+            </div>
+          )}
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
