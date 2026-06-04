@@ -1,0 +1,10 @@
+{
+  "name": "Remix: Smart AI Calorie Counter",
+  "description": "An AI-powered food tracking and macro counting application with visual meal logging and analytics.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "projectId": "eco-aviary-hmjvc",
+  "appId": "1:121777720875:web:5c859fc6549560cd50646e",
+  "apiKey": "AIzaSyARbgFfqDoBQEFzOvVt5YRzvmbHAIzzjXE",
+  "authDomain": "eco-aviary-hmjvc.firebaseapp.com",
+  "firestoreDatabaseId": "remixed-firestore-database-id",
+  "storageBucket": "eco-aviary-hmjvc.firebasestorage.app",
+  "messagingSenderId": "121777720875",
+  "measurementId": ""
+}

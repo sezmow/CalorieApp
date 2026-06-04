@@ -1,0 +1,73 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile with physical attributes, goals, and macro targets",
+      "type": "object",
+      "properties": {
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "profile": {
+          "type": "object",
+          "properties": {
+            "age": { "type": "number" },
+            "gender": { "type": "string", "enum": ["male", "female"] },
+            "weightKg": { "type": "number" },
+            "heightCm": { "type": "number" },
+            "activityLevel": { "type": "string", "enum": ["sedentary", "light", "moderate", "active", "very_active"] },
+            "goal": { "type": "string", "enum": ["lose", "maintain", "gain"] },
+            "targets": {
+              "type": "object",
+              "properties": {
+                "calories": { "type": "number" },
+                "protein": { "type": "number" },
+                "carbs": { "type": "number" },
+                "fats": { "type": "number" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Meal": {
+      "title": "Meal",
+      "description": "A food tracking entry",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "date": { "type": "string" },
+        "type": { "type": "string" },
+        "totalCalories": { "type": "number" },
+        "totalProtein": { "type": "number" },
+        "totalCarbs": { "type": "number" },
+        "totalFats": { "type": "number" },
+        "imageUrl": { "type": "string" },
+        "items": { "type": "array" }
+      }
+    },
+    "WeightEntry": {
+      "title": "WeightEntry",
+      "description": "A weight history tracking entry",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "date": { "type": "string" },
+        "weightKg": { "type": "number" }
+      }
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "User configuration and profile"
+    },
+    "users/{userId}/meals/{mealId}": {
+      "schema": { "$ref": "#/entities/Meal" },
+      "description": "Meals logged by the user"
+    },
+    "users/{userId}/weightHistory/{weightId}": {
+      "schema": { "$ref": "#/entities/WeightEntry" },
+      "description": "Weight history logged by the user"
+    }
+  }
+}
