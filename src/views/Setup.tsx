@@ -14,10 +14,10 @@ export function Setup() {
   const [errorMsg, setErrorMsg] = useState('');
   
   const [formData, setFormData] = useState({
-    age: 30,
+    age: '' as number | '',
     gender: 'male',
-    weightKg: 70,
-    heightCm: 175,
+    weightKg: '' as number | '',
+    heightCm: '' as number | '',
     activityLevel: 'moderate',
     goal: 'maintain',
   });
@@ -31,6 +31,9 @@ export function Setup() {
 
     const profile: UserProfile = {
       ...formData,
+      age: formData.age as number,
+      weightKg: formData.weightKg as number,
+      heightCm: formData.heightCm as number,
       gender: formData.gender as 'male' | 'female',
       activityLevel: formData.activityLevel as 'sedentary' | 'light' | 'moderate' | 'active' | 'very_active',
       goal: formData.goal as 'lose' | 'maintain' | 'gain',
@@ -82,7 +85,7 @@ export function Setup() {
                 type="number"
                 required
                 value={formData.age}
-                onChange={(e) => setFormData({ ...formData, age: Number(e.target.value) })}
+                onChange={(e) => setFormData({ ...formData, age: e.target.value === '' ? '' : Number(e.target.value) })}
                 className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors"
               />
             </div>
@@ -106,7 +109,7 @@ export function Setup() {
                 type="number"
                 required
                 value={formData.weightKg}
-                onChange={(e) => setFormData({ ...formData, weightKg: Number(e.target.value) })}
+                onChange={(e) => setFormData({ ...formData, weightKg: e.target.value === '' ? '' : Number(e.target.value) })}
                 className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors"
               />
             </div>
@@ -116,7 +119,7 @@ export function Setup() {
                 type="number"
                 required
                 value={formData.heightCm}
-                onChange={(e) => setFormData({ ...formData, heightCm: Number(e.target.value) })}
+                onChange={(e) => setFormData({ ...formData, heightCm: e.target.value === '' ? '' : Number(e.target.value) })}
                 className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors"
               />
             </div>
