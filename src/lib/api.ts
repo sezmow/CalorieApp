@@ -27,3 +27,30 @@ export async function analyzeFoodImage(imageBase64: string): Promise<FoodItem[]>
   }
 }
 
+export async function analyzeFoodText(text: string): Promise<FoodItem[]> {
+  try {
+    const response = await fetch("/api/analyze-food-text", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ text }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Failed to analyze text");
+    }
+
+    const items = await response.json();
+
+    return items.map((item: any) => ({
+      ...item,
+      id: crypto.randomUUID(),
+    }));
+  } catch (error: any) {
+    console.error("Error analyzing food text:", error);
+    throw new Error(error.message || "Failed to analyze text");
+  }
+}
+

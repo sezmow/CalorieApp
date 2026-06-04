@@ -1,6 +1,7 @@
 import React from "react";
 import { Home, Camera, BarChart3, User, Scan } from "lucide-react";
 import { cn } from "../lib/utils";
+import { useAuth } from "../lib/AuthContext";
 
 type Tab = "dashboard" | "log" | "analytics" | "profile";
 
@@ -11,6 +12,7 @@ interface LayoutProps {
 }
 
 export function Layout({ activeTab, setActiveTab, children }: LayoutProps) {
+  const { user } = useAuth();
   const navItems = [
     { id: "dashboard" as Tab, label: "Home", icon: Home },
     { id: "log" as Tab, label: "Scan", icon: Scan },
@@ -60,7 +62,11 @@ export function Layout({ activeTab, setActiveTab, children }: LayoutProps) {
             NutriLens
           </div>
           <button onClick={() => setActiveTab("profile")} className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center shadow-sm overflow-hidden active:scale-95 transition-transform">
-             <User size={18} className="text-slate-500 stroke-[2.5]" />
+            {user?.photoURL ? (
+              <img src={user.photoURL} alt="Profile" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+            ) : (
+              <User size={18} className="text-slate-500 stroke-[2.5]" />
+            )}
           </button>
         </header>
 

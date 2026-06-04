@@ -61,8 +61,8 @@ export function Profile() {
              <input 
                type="number" 
                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 text-slate-900 font-semibold focus:outline-none focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 transition-all font-display"
-               value={formData.age}
-               onChange={(e) => handleChange("age", Number(e.target.value))}
+               value={formData.age || ""}
+               onChange={(e) => handleChange("age", e.target.value === "" ? "" : Number(e.target.value))}
              />
           </div>
           <div className="space-y-1.5">
@@ -81,8 +81,8 @@ export function Profile() {
              <input 
                type="number" 
                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 text-slate-900 font-semibold focus:outline-none focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 transition-all font-display"
-               value={formData.weightKg}
-               onChange={(e) => handleChange("weightKg", Number(e.target.value))}
+               value={formData.weightKg || ""}
+               onChange={(e) => handleChange("weightKg", e.target.value === "" ? "" : Number(e.target.value))}
              />
           </div>
           <div className="space-y-1.5">
@@ -90,8 +90,8 @@ export function Profile() {
              <input 
                type="number" 
                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 text-slate-900 font-semibold focus:outline-none focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 transition-all font-display"
-               value={formData.heightCm}
-               onChange={(e) => handleChange("heightCm", Number(e.target.value))}
+               value={formData.heightCm || ""}
+               onChange={(e) => handleChange("heightCm", e.target.value === "" ? "" : Number(e.target.value))}
              />
           </div>
         </div>

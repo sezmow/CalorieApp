@@ -18,7 +18,7 @@ import {
 import { cn } from "../lib/utils";
 import { format, subDays, isSameDay } from "date-fns";
 import { motion } from "motion/react";
-import { Activity, ChevronLeft, ChevronRight } from "lucide-react";
+import { Activity, ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
 
 type Timeframe = "week" | "month";
 
@@ -97,8 +97,12 @@ export function Analytics() {
 
   const getChartData = () => {
     if (timeframe === "week") {
+      const today = new Date();
+      const startOfWeek = new Date(today);
+      startOfWeek.setDate(today.getDate() - today.getDay());
       return Array.from({ length: 7 }).map((_, i) => {
-        const d = subDays(new Date(), 6 - i);
+        const d = new Date(startOfWeek);
+        d.setDate(startOfWeek.getDate() + i);
         const dayMeals = meals.filter((m) => isSameDay(new Date(m.date), d));
         const cals = dayMeals.reduce((acc, m) => acc + m.totalCalories, 0);
         return {
@@ -188,9 +192,25 @@ export function Analytics() {
               <h3 className="font-display font-bold text-2xl text-slate-900 tracking-tight flex items-center gap-3">
                 Calorie Intake
                 {timeframe === "month" && (
-                  <span className="text-sm font-semibold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg tracking-normal font-sans">
-                    {formatWeekRange(calendarWeeks[safeWeekIndex])}
-                  </span>
+                  <div className="flex items-center gap-1.5 font-sans">
+                    <button
+                      onClick={handlePrevWeek}
+                      disabled={safeWeekIndex === 0}
+                      className="p-1 rounded-md hover:bg-slate-100 disabled:opacity-30 text-slate-500 transition-colors"
+                    >
+                      <ChevronLeft size={18} strokeWidth={3} />
+                    </button>
+                    <span className="text-sm font-semibold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg tracking-normal">
+                      {formatWeekRange(calendarWeeks[safeWeekIndex])}
+                    </span>
+                    <button
+                      onClick={handleNextWeek}
+                      disabled={safeWeekIndex === calendarWeeks.length - 1}
+                      className="p-1 rounded-md hover:bg-slate-100 disabled:opacity-30 text-slate-500 transition-colors"
+                    >
+                      <ChevronRight size={18} strokeWidth={3} />
+                    </button>
+                  </div>
                 )}
               </h3>
               <p className="text-slate-500 font-medium">
@@ -205,11 +225,11 @@ export function Analytics() {
             </div>
 
             {timeframe === "month" && (
-              <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-xl p-1 shadow-sm">
+              <div className="relative flex items-center bg-white border border-slate-200 rounded-xl shadow-sm hover:border-slate-300 transition-colors">
                 <select
                   value={selectedMonth}
                   onChange={(e) => setSelectedMonth(Number(e.target.value))}
-                  className="bg-transparent pl-3 pr-2 py-1.5 text-sm font-bold text-slate-700 outline-none cursor-pointer appearance-none"
+                  className="bg-transparent pl-4 pr-10 py-2 text-sm font-bold text-slate-700 outline-none cursor-pointer appearance-none w-full"
                 >
                   {months.map((m, i) => (
                     <option key={i} value={i}>
@@ -217,22 +237,8 @@ export function Analytics() {
                     </option>
                   ))}
                 </select>
-                <div className="w-px h-5 bg-slate-200" />
-                <div className="flex gap-1">
-                  <button
-                    onClick={handlePrevWeek}
-                    disabled={safeWeekIndex === 0}
-                    className="p-1.5 rounded-lg hover:bg-slate-100 disabled:opacity-30 text-slate-600 transition-colors"
-                  >
-                    <ChevronLeft size={20} className="stroke-[2.5]" />
-                  </button>
-                  <button
-                    onClick={handleNextWeek}
-                    disabled={safeWeekIndex === calendarWeeks.length - 1}
-                    className="p-1.5 rounded-lg hover:bg-slate-100 disabled:opacity-30 text-slate-600 transition-colors"
-                  >
-                    <ChevronRight size={20} className="stroke-[2.5]" />
-                  </button>
+                <div className="absolute right-3 pointer-events-none text-slate-400">
+                  <ChevronDown size={16} strokeWidth={3} />
                 </div>
               </div>
             )}
@@ -298,7 +304,7 @@ export function Analytics() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-white p-6 rounded-3xl border border-slate-100/50 shadow-sm flex flex-col items-center"
+          className="bg-white p-6 rounded-3xl border border-slate-100/50 shadow-sm flex flex-col items-center md:col-span-2"
         >
           <div className="w-full mb-6 text-center">
             <h3 className="font-display font-bold text-2xl text-slate-900 tracking-tight">
@@ -362,87 +368,6 @@ export function Analytics() {
               <div className="w-3 h-3 rounded-full bg-indigo-500" /> Fats
             </div>
           </div>
-        </motion.div>
-
-        {/* Weight Tracker */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-white p-6 rounded-3xl border border-slate-100/50 shadow-sm"
-        >
-          <div className="mb-8">
-            <h3 className="font-display font-bold text-2xl text-slate-900 tracking-tight">
-              Weight
-            </h3>
-            <p className="text-slate-500 font-medium tracking-tight">
-              Current:{" "}
-              <span className="font-bold text-slate-800">
-                {profile.weightKg} kg
-              </span>
-            </p>
-          </div>
-          {weightData.length > 0 ? (
-            <div className="h-56 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart
-                  data={weightData}
-                  margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
-                >
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    vertical={false}
-                    stroke="#f1f5f9"
-                  />
-                  <XAxis
-                    dataKey="name"
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fill: "#94a3b8", fontSize: 13, fontWeight: 600 }}
-                    dy={10}
-                  />
-                  <YAxis
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fill: "#94a3b8", fontSize: 13, fontWeight: 600 }}
-                    domain={["dataMin - 2", "dataMax + 2"]}
-                  />
-                  <Tooltip
-                    cursor={{
-                      stroke: "#cbd5e1",
-                      strokeWidth: 1,
-                      strokeDasharray: "4 4",
-                    }}
-                    contentStyle={{
-                      borderRadius: "16px",
-                      border: "none",
-                      boxShadow: "0 10px 25px -5px rgb(0 0 0 / 0.1)",
-                      fontWeight: 600,
-                      color: "#0f172a",
-                    }}
-                  />
-                  <Line
-                    type="step"
-                    dataKey="weight"
-                    stroke="#0f172a"
-                    strokeWidth={4}
-                    dot={{
-                      r: 6,
-                      fill: "#0f172a",
-                      strokeWidth: 3,
-                      stroke: "#fff",
-                    }}
-                    activeDot={{ r: 8 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          ) : (
-            <div className="flex-1 h-56 flex flex-col items-center justify-center text-slate-400">
-              <Activity size={32} className="text-slate-200 mb-2" />
-              <span className="font-medium">No history yet</span>
-            </div>
-          )}
         </motion.div>
       </div>
     </div>

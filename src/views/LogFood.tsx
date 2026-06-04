@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
-import { Camera, Image as ImageIcon, Type, Sparkles, Check, Plus, Minus, Trash2, ScanLine } from "lucide-react";
+import { Camera, Image as ImageIcon, Type, Sparkles, Check, Plus, Minus, Trash2, ScanLine, Edit3, Send } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-import { analyzeFoodImage } from "../lib/api";
+import { analyzeFoodImage, analyzeFoodText } from "../lib/api";
 import { useAppStore } from "../lib/store";
 import { FoodItem } from "../types";
 
@@ -14,6 +14,28 @@ export function LogFood({ onLogComplete }: { onLogComplete: () => void }) {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { addMeal } = useAppStore();
+
+  const [manualText, setManualText] = useState("");
+  const [showManualForm, setShowManualForm] = useState(false);
+  const [isAnalyzingText, setIsAnalyzingText] = useState(false);
+  const manualFormRef = useRef<HTMLDivElement>(null);
+  const [manualItem, setManualItem] = useState({
+    name: "",
+    calories: "" as number | "",
+    protein: "" as number | "",
+    carbs: "" as number | "",
+    fats: "" as number | "",
+  });
+
+  const handleManualToggle = () => {
+    const nextState = !showManualForm;
+    setShowManualForm(nextState);
+    if (nextState) {
+      setTimeout(() => {
+        manualFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 150);
+    }
+  };
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     setErrorMsg(null);
@@ -47,6 +69,73 @@ export function LogFood({ onLogComplete }: { onLogComplete: () => void }) {
       setErrorMsg(e.message || "Failed to analyze image");
       setStep("input");
     }
+  };
+
+  const startProcessingText = async () => {
+    if (!manualText.trim()) return;
+    setIsAnalyzingText(true);
+    setErrorMsg(null);
+    try {
+      const items = await analyzeFoodText(manualText);
+      if (items && items.length > 0) {
+        const totalCalories = items.reduce((sum, item) => sum + item.calories, 0);
+        const totalProtein = items.reduce((sum, item) => sum + item.protein, 0);
+        const totalCarbs = items.reduce((sum, item) => sum + item.carbs, 0);
+        const totalFats = items.reduce((sum, item) => sum + item.fats, 0);
+        
+        const name = items.length === 1 ? items[0].name : "Mixed Meal";
+        
+        setManualItem({
+          name,
+          calories: Math.round(totalCalories),
+          protein: Math.round(totalProtein),
+          carbs: Math.round(totalCarbs),
+          fats: Math.round(totalFats)
+        });
+        
+        setShowManualForm(true);
+        setTimeout(() => {
+          manualFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 150);
+      }
+      setManualText("");
+    } catch (e: any) {
+      console.error(e);
+      setErrorMsg(e.message || "Failed to analyze text");
+    } finally {
+      setIsAnalyzingText(false);
+    }
+  };
+
+  const handleManualFormSave = () => {
+    if (!manualItem.name || manualItem.calories === "") return;
+    
+    const newItem: FoodItem = {
+      id: crypto.randomUUID(),
+      name: manualItem.name,
+      calories: Number(manualItem.calories) || 0,
+      protein: Number(manualItem.protein) || 0,
+      carbs: Number(manualItem.carbs) || 0,
+      fats: Number(manualItem.fats) || 0,
+      quantity: 1,
+      unit: "serving"
+    };
+
+    addMeal({
+      id: crypto.randomUUID(),
+      date: new Date().toISOString(),
+      type: "meal",
+      items: [newItem],
+      totalCalories: newItem.calories,
+      totalProtein: newItem.protein,
+      totalCarbs: newItem.carbs,
+      totalFats: newItem.fats
+    });
+    
+    setStep("input");
+    setShowManualForm(false);
+    setManualItem({ name: "", calories: "", protein: "", carbs: "", fats: "" });
+    onLogComplete();
   };
 
   const handleUpdateQuantity = (id: string, newQuantity: number) => {
@@ -142,6 +231,132 @@ export function LogFood({ onLogComplete }: { onLogComplete: () => void }) {
                   <Camera size={32} className="stroke-[2.5]" />
                   <span className="font-display font-bold text-xl tracking-tight">Camera / Upload</span>
                 </button>
+
+                <button
+                  onClick={handleManualToggle}
+                  className="bg-white border border-slate-200 text-slate-700 rounded-3xl p-4 md:p-6 flex items-center justify-center gap-3 hover:bg-slate-50 transition-all active:scale-[0.98] shadow-sm"
+                >
+                  <Edit3 size={24} className="text-slate-400" />
+                  <span className="font-display font-bold text-lg tracking-tight">Enter Manually</span>
+                </button>
+
+                <AnimatePresence>
+                  {showManualForm && (
+                    <motion.div
+                      ref={manualFormRef}
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="bg-white border border-slate-200 rounded-3xl p-6 space-y-4 shadow-sm mt-2">
+                        <h3 className="font-display font-bold text-lg text-slate-800">Manual Entry</h3>
+                        <input
+                          type="text"
+                          placeholder="Food Name"
+                          className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition"
+                          value={manualItem.name}
+                          onChange={(e) => setManualItem({ ...manualItem, name: e.target.value })}
+                        />
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="relative flex items-center">
+                            <div className="absolute left-4 text-[10px] font-bold text-orange-500 uppercase tracking-wider pointer-events-none">
+                              CAL
+                            </div>
+                            <input
+                              type="number"
+                              placeholder="Calories"
+                              className="w-full pl-12 pr-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition font-medium text-slate-800"
+                              value={manualItem.calories}
+                              onChange={(e) => setManualItem({ ...manualItem, calories: e.target.value === "" ? "" : Number(e.target.value) })}
+                            />
+                          </div>
+                          <div className="relative flex items-center">
+                            <div className="absolute left-4 text-[11px] font-bold text-blue-500 pointer-events-none">
+                              Pro
+                            </div>
+                            <input
+                              type="number"
+                              placeholder="Protein (g)"
+                              className="w-full pl-12 pr-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition font-medium text-slate-800"
+                              value={manualItem.protein}
+                              onChange={(e) => setManualItem({ ...manualItem, protein: e.target.value === "" ? "" : Number(e.target.value) })}
+                            />
+                          </div>
+                          <div className="relative flex items-center">
+                            <div className="absolute left-4 text-[11px] font-bold text-purple-500 pointer-events-none">
+                              Carb
+                            </div>
+                            <input
+                              type="number"
+                              placeholder="Carbs (g)"
+                              className="w-full pl-12 pr-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition font-medium text-slate-800"
+                              value={manualItem.carbs}
+                              onChange={(e) => setManualItem({ ...manualItem, carbs: e.target.value === "" ? "" : Number(e.target.value) })}
+                            />
+                          </div>
+                          <div className="relative flex items-center">
+                            <div className="absolute left-4 text-[11px] font-bold text-amber-500 pointer-events-none">
+                              Fat
+                            </div>
+                            <input
+                              type="number"
+                              placeholder="Fats (g)"
+                              className="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition font-medium text-slate-800"
+                              value={manualItem.fats}
+                              onChange={(e) => setManualItem({ ...manualItem, fats: e.target.value === "" ? "" : Number(e.target.value) })}
+                            />
+                          </div>
+                        </div>
+                        <button
+                          onClick={handleManualFormSave}
+                          disabled={!manualItem.name || manualItem.calories === ""}
+                          className="w-full bg-emerald-500 text-white font-bold py-3.5 rounded-xl mt-2 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-emerald-600 transition"
+                        >
+                          Log Food
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                <div className="relative mt-2">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-slate-200"></div>
+                  </div>
+                  <div className="relative flex justify-center text-sm">
+                    <span className="px-4 bg-slate-50 text-slate-500 font-semibold tracking-wide uppercase">OR</span>
+                  </div>
+                </div>
+
+                <div className="bg-white border border-slate-200 rounded-3xl p-3 pl-4 pr-3 shadow-sm flex items-start gap-2 group focus-within:border-emerald-400 focus-within:ring-4 focus-within:ring-emerald-500/10 transition-all">
+                  <Type size={20} className="text-slate-400 shrink-0 mt-1" />
+                  <textarea
+                    placeholder="Describe what you ate... (e.g. 2 eggs on toast)"
+                    className="w-full bg-transparent resize-none h-24 outline-none text-slate-700 placeholder:text-slate-400 text-sm"
+                    value={manualText}
+                    onChange={e => setManualText(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        startProcessingText();
+                      }
+                    }}
+                  />
+                  <button 
+                    onClick={startProcessingText}
+                    disabled={!manualText.trim() || isAnalyzingText}
+                    className="bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-200 disabled:text-slate-400 text-white p-2.5 rounded-2xl shrink-0 transition-colors self-end"
+                    title="Input details for me"
+                  >
+                    {isAnalyzingText ? (
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin m-[1px]" />
+                    ) : (
+                      <Send size={18} />
+                    )}
+                  </button>
+                </div>
+
               </div>
             </motion.div>
           )}
