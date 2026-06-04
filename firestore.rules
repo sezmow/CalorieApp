@@ -25,48 +25,16 @@ service cloud.firestore {
 
     // Rules for User Profile
     match /users/{userId} {
-      function isValidUserProfile(data) {
-        return (data.keys().hasAll(['profile', 'updatedAt']) || data.keys().hasAll(['profile', 'createdAt']))
-            && data.profile is map
-            && data.profile.keys().hasAll(['age', 'gender', 'weightKg', 'heightCm', 'activityLevel', 'goal', 'targets'])
-            && data.profile.age is number
-            && data.profile.weightKg is number
-            && data.profile.heightCm is number;
-      }
-
-      allow read: if isOwner(userId);
-      allow create: if isOwner(userId) && isValidUserProfile(incoming());
-      allow update: if isOwner(userId) && isValidUserProfile(incoming());
-      allow delete: if false; 
+      allow read, write: if isOwner(userId);
 
       // Rules for Meals
       match /meals/{mealId} {
-        function isValidMeal(data) {
-          return data.keys().hasAll(['id', 'date', 'type', 'totalCalories'])
-              && data.id is string
-              && data.date is string
-              && data.totalCalories is number;
-        }
-
-        allow read: if isOwner(userId);
-        allow create: if isOwner(userId) && isValidMeal(incoming());
-        allow update: if isOwner(userId) && isValidMeal(incoming());
-        allow delete: if isOwner(userId);
+        allow read, write: if isOwner(userId);
       }
 
       // Rules for Weight History
       match /weightHistory/{weightId} {
-        function isValidWeight(data) {
-          return data.keys().hasAll(['id', 'date', 'weightKg'])
-              && data.id is string
-              && data.date is string
-              && data.weightKg is number;
-        }
-
-        allow read: if isOwner(userId);
-        allow create: if isOwner(userId) && isValidWeight(incoming());
-        allow update: if isOwner(userId) && isValidWeight(incoming());
-        allow delete: if isOwner(userId);
+        allow read, write: if isOwner(userId);
       }
     }
   }
