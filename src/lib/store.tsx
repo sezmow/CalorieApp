@@ -48,7 +48,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           setState(s => ({ ...s, profile: null as any }));
         }
         setLoading(false);
-      }, (error) => handleFirestoreError(error, OperationType.GET, `users/${uid}`));
+      }, (error) => {
+        handleFirestoreError(error, OperationType.GET, `users/${uid}`);
+        setState(s => ({ ...s, profile: null as any }));
+        setLoading(false);
+      });
 
       const mealsRef = collection(db, `users/${uid}/meals`);
       unsubMeals = onSnapshot(mealsRef, (snap) => {
@@ -84,6 +88,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const setProfile = async (profile: UserProfile) => {
     if (!uid) return;
     try {
+      setState(s => ({ ...s, profile }));
       await setDoc(doc(db, "users", uid), { profile, updatedAt: new Date().toISOString() }, { merge: true });
     } catch (error) {
       handleFirestoreError(error, OperationType.WRITE, `users/${uid}`);

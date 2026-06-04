@@ -3,7 +3,6 @@
   "appId": "1:127340928400:web:b194545bfba0a49c6a2715",
   "apiKey": "AIzaSyAJiFdoo6-iUGZ5uprpXGi1VClPi_llbfM",   
   "authDomain": "calorieapp-9f3ce.firebaseapp.com",
-  "firestoreDatabaseId": "remixed-firestore-database-id",
   "storageBucket": "calorieapp-9f3ce.firebasestorage.app",
   "messagingSenderId": "127340928400",
   "measurementId": "G-MLK5DR1JSK"
