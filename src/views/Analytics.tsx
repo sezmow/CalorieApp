@@ -148,7 +148,7 @@ export function Analytics() {
   // Format weight data
   const weightData = weightHistory.map((w) => ({
     name: format(new Date(w.date), "MMM d"),
-    weight: w.weightKg,
+    weight: w.weightLbs,
   }));
 
   return (

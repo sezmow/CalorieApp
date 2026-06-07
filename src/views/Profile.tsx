@@ -20,8 +20,9 @@ export function Profile() {
 
   const handleSave = () => {
     const targets = calculateTDEE(
-      formData.weightKg,
-      formData.heightCm,
+      formData.weightLbs,
+      formData.heightFeet,
+      formData.heightInches,
       formData.age,
       formData.gender,
       formData.activityLevel,
@@ -77,22 +78,35 @@ export function Profile() {
              </select>
           </div>
           <div className="space-y-1.5">
-             <label className="text-sm font-bold text-slate-500">Weight (kg)</label>
+             <label className="text-sm font-bold text-slate-500">Weight (lbs)</label>
              <input 
                type="number" 
                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 text-slate-900 font-semibold focus:outline-none focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 transition-all font-display"
-               value={formData.weightKg || ""}
-               onChange={(e) => handleChange("weightKg", e.target.value === "" ? "" : Number(e.target.value))}
+               value={formData.weightLbs || ""}
+               onChange={(e) => handleChange("weightLbs", e.target.value === "" ? "" : Number(e.target.value))}
              />
           </div>
           <div className="space-y-1.5">
-             <label className="text-sm font-bold text-slate-500">Height (cm)</label>
-             <input 
-               type="number" 
-               className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 text-slate-900 font-semibold focus:outline-none focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 transition-all font-display"
-               value={formData.heightCm || ""}
-               onChange={(e) => handleChange("heightCm", e.target.value === "" ? "" : Number(e.target.value))}
-             />
+             <label className="text-sm font-bold text-slate-500">Height</label>
+             <div className="flex flex-col gap-1.5">
+               <input 
+                 type="number" 
+                 placeholder="Feet"
+                 className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-900 font-semibold focus:outline-none focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 transition-all font-display"
+                 value={formData.heightFeet || ""}
+                 onChange={(e) => handleChange("heightFeet", e.target.value === "" ? "" : Number(e.target.value))}
+               />
+               <select
+                 className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-900 font-semibold focus:outline-none focus:border-emerald-400 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 transition-all font-display"
+                 value={formData.heightInches || 0}
+                 onChange={(e) => handleChange("heightInches", Number(e.target.value))}
+               >
+                 <option value={0}>0 inches</option>
+                 {[1,2,3,4,5,6,7,8,9,10,11].map(i => (
+                   <option key={i} value={i}>{i} inches</option>
+                 ))}
+               </select>
+             </div>
           </div>
         </div>
       </div>

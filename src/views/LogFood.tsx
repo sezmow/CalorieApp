@@ -265,7 +265,6 @@ export function LogFood({ onLogComplete }: { onLogComplete: () => void }) {
                             </div>
                             <input
                               type="number"
-                              placeholder="Calories"
                               className="w-full pl-12 pr-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition font-medium text-slate-800"
                               value={manualItem.calories}
                               onChange={(e) => setManualItem({ ...manualItem, calories: e.target.value === "" ? "" : Number(e.target.value) })}
@@ -273,11 +272,10 @@ export function LogFood({ onLogComplete }: { onLogComplete: () => void }) {
                           </div>
                           <div className="relative flex items-center">
                             <div className="absolute left-4 text-[11px] font-bold text-blue-500 pointer-events-none">
-                              Pro
+                              P
                             </div>
                             <input
                               type="number"
-                              placeholder="Protein (g)"
                               className="w-full pl-12 pr-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition font-medium text-slate-800"
                               value={manualItem.protein}
                               onChange={(e) => setManualItem({ ...manualItem, protein: e.target.value === "" ? "" : Number(e.target.value) })}
@@ -285,11 +283,10 @@ export function LogFood({ onLogComplete }: { onLogComplete: () => void }) {
                           </div>
                           <div className="relative flex items-center">
                             <div className="absolute left-4 text-[11px] font-bold text-purple-500 pointer-events-none">
-                              Carb
+                              C
                             </div>
                             <input
                               type="number"
-                              placeholder="Carbs (g)"
                               className="w-full pl-12 pr-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition font-medium text-slate-800"
                               value={manualItem.carbs}
                               onChange={(e) => setManualItem({ ...manualItem, carbs: e.target.value === "" ? "" : Number(e.target.value) })}
@@ -297,11 +294,10 @@ export function LogFood({ onLogComplete }: { onLogComplete: () => void }) {
                           </div>
                           <div className="relative flex items-center">
                             <div className="absolute left-4 text-[11px] font-bold text-amber-500 pointer-events-none">
-                              Fat
+                              F
                             </div>
                             <input
                               type="number"
-                              placeholder="Fats (g)"
                               className="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition font-medium text-slate-800"
                               value={manualItem.fats}
                               onChange={(e) => setManualItem({ ...manualItem, fats: e.target.value === "" ? "" : Number(e.target.value) })}

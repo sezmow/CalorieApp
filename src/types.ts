@@ -24,8 +24,9 @@ export interface Meal {
 export interface UserProfile {
   age: number;
   gender: "male" | "female";
-  weightKg: number;
-  heightCm: number;
+  weightLbs: number;
+  heightFeet: number;
+  heightInches: number;
   activityLevel: "sedentary" | "light" | "moderate" | "active" | "very_active";
   goal: "lose" | "maintain" | "gain";
   targets: {
@@ -38,7 +39,7 @@ export interface UserProfile {
 
 export interface WeightEntry {
   date: string;
-  weightKg: number;
+  weightLbs: number;
 }
 
 export interface AppState {

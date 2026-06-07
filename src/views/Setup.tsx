@@ -6,6 +6,7 @@ import { doc, setDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useAuth } from '../lib/AuthContext';
 import { handleFirestoreError, OperationType } from '../lib/firebaseUtils';
+import { calculateTDEE } from '../lib/utils';
 
 export function Setup() {
   const { user } = useAuth();
@@ -16,8 +17,9 @@ export function Setup() {
   const [formData, setFormData] = useState({
     age: '' as number | '',
     gender: 'male',
-    weightKg: '' as number | '',
-    heightCm: '' as number | '',
+    weightLbs: '' as number | '',
+    heightFeet: '' as number | '',
+    heightInches: 0,
     activityLevel: 'moderate',
     goal: 'maintain',
   });
@@ -29,15 +31,26 @@ export function Setup() {
     setLoading(true);
     setErrorMsg('');
 
+    const targets = calculateTDEE(
+      formData.weightLbs as number,
+      formData.heightFeet as number,
+      formData.heightInches as number,
+      formData.age as number,
+      formData.gender as 'male' | 'female',
+      formData.activityLevel as 'sedentary' | 'light' | 'moderate' | 'active' | 'very_active',
+      formData.goal as 'lose' | 'maintain' | 'gain'
+    );
+
     const profile: UserProfile = {
       ...formData,
       age: formData.age as number,
-      weightKg: formData.weightKg as number,
-      heightCm: formData.heightCm as number,
+      weightLbs: formData.weightLbs as number,
+      heightFeet: formData.heightFeet as number,
+      heightInches: formData.heightInches as number,
       gender: formData.gender as 'male' | 'female',
       activityLevel: formData.activityLevel as 'sedentary' | 'light' | 'moderate' | 'active' | 'very_active',
       goal: formData.goal as 'lose' | 'maintain' | 'gain',
-      targets: { calories: 2400, protein: 150, carbs: 250, fats: 80 } // Simplified for now, real app would calc this
+      targets
     };
 
     try {
@@ -102,26 +115,39 @@ export function Setup() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Weight (kg)</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Weight (lbs)</label>
               <input
                 type="number"
                 required
-                value={formData.weightKg}
-                onChange={(e) => setFormData({ ...formData, weightKg: e.target.value === '' ? '' : Number(e.target.value) })}
+                value={formData.weightLbs}
+                onChange={(e) => setFormData({ ...formData, weightLbs: e.target.value === '' ? '' : Number(e.target.value) })}
                 className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Height (cm)</label>
-              <input
-                type="number"
-                required
-                value={formData.heightCm}
-                onChange={(e) => setFormData({ ...formData, heightCm: e.target.value === '' ? '' : Number(e.target.value) })}
-                className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors"
-              />
+              <label className="block text-sm font-medium text-slate-700 mb-1">Height</label>
+              <div className="flex flex-col gap-2">
+                <input
+                  type="number"
+                  required
+                  placeholder="Feet"
+                  value={formData.heightFeet}
+                  onChange={(e) => setFormData({ ...formData, heightFeet: e.target.value === '' ? '' : Number(e.target.value) })}
+                  className="w-full px-3 py-1.5 text-sm rounded-lg bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors"
+                />
+                <select
+                  value={formData.heightInches}
+                  onChange={(e) => setFormData({ ...formData, heightInches: Number(e.target.value) })}
+                  className="w-full px-3 py-1.5 text-sm rounded-lg bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors"
+                >
+                  <option value={0}>0 inches</option>
+                  {[1,2,3,4,5,6,7,8,9,10,11].map(i => (
+                    <option key={i} value={i}>{i} inches</option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
 

@@ -73,8 +73,20 @@ async function startServer() {
       console.error("Error analyzing food:", error);
       
       let errorMessage = error.message || "Failed to analyze image";
+      
+      try {
+        const parsed = JSON.parse(errorMessage);
+        if (parsed.error && parsed.error.message) {
+          errorMessage = parsed.error.message;
+        }
+      } catch (e) {
+        // Not JSON, keep original
+      }
+
       if (errorMessage.includes("503") || errorMessage.includes("high demand") || errorMessage.includes("UNAVAILABLE")) {
         errorMessage = "The AI service is currently experiencing high demand. Please try again in a few moments or enter the details manually.";
+      } else if (errorMessage.includes("401") || errorMessage.includes("authentication") || errorMessage.includes("API key")) {
+        errorMessage = "Invalid Gemini API Key. Please provide a valid API key in the application settings.";
       }
       
       res.status(500).json({ error: errorMessage });
@@ -129,8 +141,20 @@ async function startServer() {
       console.error("Error analyzing text:", error);
       
       let errorMessage = error.message || "Failed to analyze text description";
+      
+      try {
+        const parsed = JSON.parse(errorMessage);
+        if (parsed.error && parsed.error.message) {
+          errorMessage = parsed.error.message;
+        }
+      } catch (e) {
+        // Not JSON, keep original
+      }
+
       if (errorMessage.includes("503") || errorMessage.includes("high demand") || errorMessage.includes("UNAVAILABLE")) {
         errorMessage = "The AI service is currently experiencing high demand. Please try again in a few moments or enter the details manually.";
+      } else if (errorMessage.includes("401") || errorMessage.includes("authentication") || errorMessage.includes("API key")) {
+        errorMessage = "Invalid Gemini API Key. Please provide a valid API key in the application settings.";
       }
       
       res.status(500).json({ error: errorMessage });

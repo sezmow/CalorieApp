@@ -12,8 +12,9 @@
           "properties": {
             "age": { "type": "number" },
             "gender": { "type": "string", "enum": ["male", "female"] },
-            "weightKg": { "type": "number" },
-            "heightCm": { "type": "number" },
+            "weightLbs": { "type": "number" },
+            "heightFeet": { "type": "number" },
+            "heightInches": { "type": "number" },
             "activityLevel": { "type": "string", "enum": ["sedentary", "light", "moderate", "active", "very_active"] },
             "goal": { "type": "string", "enum": ["lose", "maintain", "gain"] },
             "targets": {
@@ -52,7 +53,7 @@
       "properties": {
         "id": { "type": "string" },
         "date": { "type": "string" },
-        "weightKg": { "type": "number" }
+        "weightLbs": { "type": "number" }
       }
     }
   },

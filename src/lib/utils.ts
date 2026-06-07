@@ -7,13 +7,17 @@ export function cn(...inputs: ClassValue[]) {
 
 // BMR and TDEE Calculators (Mifflin-St Jeor)
 export function calculateTDEE(
-  weightKg: number,
-  heightCm: number,
+  weightLbs: number,
+  heightFeet: number,
+  heightInches: number,
   age: number,
   gender: "male" | "female",
   activityLevel: "sedentary" | "light" | "moderate" | "active" | "very_active",
   goal: "lose" | "maintain" | "gain"
 ) {
+  const weightKg = weightLbs / 2.20462;
+  const heightCm = (heightFeet * 12 + heightInches) * 2.54;
+
   let bmr = 10 * weightKg + 6.25 * heightCm - 5 * age;
   bmr += gender === "male" ? 5 : -161;
 
